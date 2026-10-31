@@ -390,7 +390,7 @@
           </div>
           <div class="callout">
             <strong>UI skip conditions</strong>
-            There are two external-site preconditions that can prevent a UI scenario from reaching its assertions: Amazon can return a recognized anti-automation challenge on the homepage, or the selected listing can be unavailable for the test context's delivery location. In the latest headed run, the four skips were caused by delivery availability, not by the challenge. Neither condition is a login requirement. A skipped case is unexecuted, not passed.
+            There are two external-site preconditions that can prevent a UI scenario from reaching its assertions: Amazon can return a recognized anti-automation challenge on the homepage, or the selected listing can be unavailable for the test context's delivery location. In the latest headed run, the four skips were caused by delivery availability, not by the challenge. A skipped case is unexecuted, not passed.
           </div>
         </section>
 
@@ -482,10 +482,10 @@ npm run report           # open latest HTML report</code></pre>
               <li><strong>Product detail:</strong> skipped before the price, rating, and image assertions complete because this listing has no deliverable offer for the active location.</li>
               <li><strong>Add to cart:</strong> skipped in the shared cart setup before clicking Add to Cart; without an available offer there is no valid cart-count increment to assert.</li>
               <li><strong>Cart contents:</strong> uses the same add-to-cart setup. Since no item can be added, product, quantity, and subtotal assertions cannot run.</li>
-              <li><strong>Checkout checkpoint:</strong> also depends on adding the item first. With an empty test cart, the flow cannot proceed to the sign-in prompt.</li>
+              <li><strong>Checkout scenario:</strong> also depends on adding the item first. The shared setup skips before the cart/checkout steps because the test cart has no available product.</li>
             </ol>
             <p style="margin-top:12px"><strong>Why the manual browser can differ:</strong> each Playwright test creates a fresh browser context. It does not inherit the open manual browser tab, its cookies, delivery PIN, or cart. The configured <code>en-IN</code> locale and <code>Asia/Kolkata</code> timezone do not set a delivery address.</p>
-            <p><strong>Login is not the blocker:</strong> no account is needed for the homepage, search, filter, product, or cart steps. The checkout scenario is designed to stop at the sign-in prompt and never enter credentials or place an order. To execute the four product-dependent scenarios, use a test delivery location where the chosen listing is available, or select an approved available listing. If Amazon instead presents a bot-protection challenge, the UI helper reports that separate condition as a skip.</p>
+            <p><strong>Why these flows cannot continue:</strong> price, add-to-cart, cart totals, and checkout depend on a deliverable offer. When Amazon provides none for the active location, those product-dependent assertions cannot be exercised. Run them with an approved test location and a listing available there. A bot-protection challenge is a separate possible skip condition.</p>
             <p>The Petstore API suite is independent of Amazon and passed all 3 tests in its latest separate run.</p>
           </div>
           <p>This status describes the local environment, not a guarantee of future live-service results. The generated run report is under <code>playwright-report/index.html</code>. The source project and workflow are in the GitHub repository <a href="https://github.com/srinivas786108/hcl_Hackathon">srinivas786108/hcl_Hackathon</a>.</p>
