@@ -43,7 +43,7 @@ Playwright creates `playwright-report/` after a test run. Screenshots, traces, a
 
 ## GitHub Actions
 
-The workflow in `.github/workflows/playwright.yml` runs TypeScript validation and API tests on pushes and pull requests targeting `main`. The live Amazon UI job is opt-in from **Actions → Playwright Tests → Run workflow** using the `run_ui` checkbox because Amazon may restrict hosted CI traffic or show region-dependent offers. An opted-in UI failure remains visible as a failure. The API and UI jobs each upload their HTML report and test artifacts for 14 days; download `playwright-api-*` or `playwright-ui-*` from the workflow run's Artifacts section.
+The workflow in `.github/workflows/playwright.yml` runs TypeScript validation, API tests, and UI tests on pushes and pull requests targeting `main`, and on manual runs from the Actions tab. The three jobs run separately so failures are easy to attribute. Amazon may restrict hosted CI traffic or show region-dependent offers; in that case the UI job may fail or report skipped cases. The API and UI jobs each upload their HTML report and test artifacts for 14 days; download `playwright-api-*` or `playwright-ui-*` from the workflow run's Artifacts section.
 
 Amazon can return an anti-automation challenge to hosted CI runners. In that case the UI tests are marked skipped by the suite's challenge guard; review the run summary and report rather than treating skipped scenarios as passed. The Petstore API tests run independently.
 

@@ -6,12 +6,6 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      run_ui:
-        description: Run live Amazon UI tests (may be restricted by Amazon)
-        type: boolean
-        required: false
-        default: false
 
 permissions:
   contents: read
@@ -78,7 +72,6 @@ jobs:
 
   ui-tests:
     name: Amazon UI tests
-    if: github.event_name == 'workflow_dispatch' && inputs.run_ui
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
