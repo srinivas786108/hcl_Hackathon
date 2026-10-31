@@ -187,6 +187,9 @@
     }
     .scenario h3 { margin: 1px 0 4px; }
     .scenario p { margin: 0; color: var(--muted); font-size: 14px; }
+    .scenario ol { margin: 8px 0 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
+    .scenario li { padding: 2px 0; }
+    .scenario .assertions { margin-top: 9px; color: var(--ink); font-size: 13px; }
     .table-wrap { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -315,7 +318,7 @@
           </div>
           <div class="callout warning">
             <strong>Live-site limitation - transparent result reporting</strong>
-            Amazon is a third-party storefront that may vary by inventory, delivery region, consent, or anti-automation response. A skipped UI test is not a pass. The latest local full-suite run recorded below had 3 API passes and 7 UI skips after Amazon returned its automated-session challenge.
+            Amazon is a third-party storefront that may vary by inventory, delivery region, consent, or anti-automation response. In the latest headed UI run, 3 scenarios passed and 4 were skipped because the selected mouse could not ship to the active delivery location. Skipped tests did not execute their remaining assertions and are not passes.
           </div>
         </section>
 
@@ -349,13 +352,41 @@
           <div class="section-heading"><span class="section-number">03</span><h2>Amazon UI scenarios</h2></div>
           <p>All seven scenarios use a fresh Playwright browser context. Shared cart state is not assumed, and the checkout case ends at the expected sign-in prompt.</p>
           <div class="scenario-list">
-            <div class="scenario"><div><h3>Homepage availability</h3><p>Open the configured storefront. Verify the Amazon page title, logo, and search input are visible.</p></div></div>
-            <div class="scenario"><div><h3>Search relevance</h3><p>Search for <code>wireless mouse</code>, wait for result listings, and require at least one result title matching the search phrase.</p></div></div>
-            <div class="scenario"><div><h3>Brand filter</h3><p>Search for the product and select the Logitech brand filter. Verify navigation reflects the filter action and results remain visible.</p></div></div>
-            <div class="scenario"><div><h3>Product details</h3><p>Open a listing and verify product title, price, customer rating, and primary image.</p></div></div>
-            <div class="scenario"><div><h3>Add to cart</h3><p>Record the initial cart count, add the product, and assert the displayed count increases by one.</p></div></div>
-            <div class="scenario"><div><h3>Cart contents</h3><p>Open the cart and check the selected product title, quantity of one, and a visible non-zero subtotal.</p></div></div>
-            <div class="scenario"><div><h3>Checkout sign-in checkpoint</h3><p>Proceed from the cart only until Amazon displays its sign-in prompt. No login or purchase is attempted.</p></div></div>
+            <div class="scenario"><div>
+              <h3>Homepage loads with title, logo, and search</h3><span class="tag">@ui</span><span class="tag">@smoke</span>
+              <ol><li>Navigate to the configured Amazon base URL.</li><li>Wait for either the storefront logo or a recognized Amazon challenge response.</li><li>Read the page title and locate <code>#nav-logo-sprites</code> and <code>#twotabsearchtextbox</code>.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> title matches Amazon; logo and search input are visible. A recognized bot-protection challenge is reported as skipped, not passed.</p>
+            </div></div>
+            <div class="scenario"><div>
+              <h3>Search returns relevant wireless mouse products</h3><span class="tag">@ui</span><span class="tag">@smoke</span>
+              <ol><li>Open the homepage and fill the search field with <code>wireless mouse</code>.</li><li>Press Enter and wait for the results page and first result card.</li><li>Inspect result headings, including organic results after any sponsored listing.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> at least one result title contains “wireless mouse”; the first sponsored result does not have to contain the exact query.</p>
+            </div></div>
+            <div class="scenario"><div>
+              <h3>A brand filter narrows the search results</h3><span class="tag">@ui</span>
+              <ol><li>Search for <code>wireless mouse</code>.</li><li>Within <code>#s-refinements</code>, locate and select the Logitech brand filter.</li><li>Wait for Amazon to navigate or update the filtered results.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> the URL changes to reflect filtering and at least one result card remains visible.</p>
+            </div></div>
+            <div class="scenario"><div>
+              <h3>Product detail page shows title, price, rating, and image</h3><span class="tag">@ui</span>
+              <ol><li>Search for <code>wireless mouse</code> and open a product detail link.</li><li>Wait for <code>#productTitle</code> and read the selected product title.</li><li>Locate the visible numeric price container, rating area, and primary image <code>#landingImage</code>.</li><li>Check for an explicit delivery-unavailable message before treating the listing as testable.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> title, visible price, rating, and image are displayed. If Amazon says the item cannot ship to the selected location, the case is skipped with that reason.</p>
+            </div></div>
+            <div class="scenario"><div>
+              <h3>Adding a product increments the cart count</h3><span class="tag">@ui</span>
+              <ol><li>Read the starting value in <code>#nav-cart-count</code>.</li><li>Search, open a deliverable product, and capture its title.</li><li>Click <code>#add-to-cart-button</code>.</li><li>Wait for the header cart count to update.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> the cart count is exactly one greater than its starting value; no checkout or purchase is submitted.</p>
+            </div></div>
+            <div class="scenario"><div>
+              <h3>Cart shows product, quantity, and subtotal</h3><span class="tag">@ui</span>
+              <ol><li>Add one deliverable product to the fresh test cart.</li><li>Navigate to <code>/gp/cart/view.html</code>.</li><li>Find the cart item row and compare its title with the title captured from the product page.</li><li>Read the row's quantity control (native field or displayed dropdown value) and the active-cart subtotal.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> the selected title is present, quantity is one, and the subtotal is visible and non-zero.</p>
+            </div></div>
+            <div class="scenario"><div>
+              <h3>Checkout stops at the sign-in checkpoint</h3><span class="tag">@ui</span>
+              <ol><li>Add one deliverable product and open the cart.</li><li>Click the proceed-to-checkout control <code>#sc-buy-box-ptc-button</code>.</li><li>Wait for the sign-in email field <code>#ap_email</code> or a sign-in heading.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> the sign-in prompt is visible. The test does not enter credentials, payment details, or place an order.</p>
+            </div></div>
           </div>
           <div class="callout">
             <strong>UI skip conditions</strong>
@@ -366,15 +397,22 @@
         <section id="api">
           <div class="section-heading"><span class="section-number">04</span><h2>Swagger Petstore API coverage</h2></div>
           <p>Base URL: <code>https://petstore.swagger.io/v2</code>. Requests accept JSON; POST requests send JSON payloads. Created records use generated identifiers to reduce collisions in the shared sandbox.</p>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Case</th><th>Request sequence</th><th>Key validations</th></tr></thead>
-              <tbody>
-                <tr><td><strong>Available pets</strong></td><td><code>GET /pet/findByStatus?status=available</code></td><td>HTTP 200; response is a non-empty array; each pet has available status, ID, name, and photo URL list; elapsed time under 2,000 ms.</td></tr>
-                <tr><td><strong>Create and read pet</strong></td><td><code>POST /pet</code>, then <code>GET /pet/{id}</code></td><td>HTTP 200; response preserves submitted ID, name, and status; follow-up GET returns the created pet details.</td></tr>
-                <tr><td><strong>Create and read order</strong></td><td>Create a test pet, <code>POST /store/order</code>, then <code>GET /store/order/{id}</code></td><td>HTTP 200; returned pet ID and placed status match; quantity is a positive integer; follow-up GET returns the order fields.</td></tr>
-              </tbody>
-            </table>
+          <div class="scenario-list">
+            <div class="scenario"><div>
+              <h3>GET available pets</h3><span class="tag">@api</span><span class="tag">@smoke</span>
+              <ol><li>Create a Playwright API request context with base URL <code>https://petstore.swagger.io/v2/</code> and <code>Accept: application/json</code>.</li><li>Record start time and send <code>GET pet/findByStatus?status=available</code>.</li><li>Measure elapsed time and parse the JSON response as a pet array.</li><li>For each returned pet, inspect ID, name, photo URL list, and status.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> HTTP 200; elapsed time under 2,000 ms; a non-empty array; every pet has an ID, non-empty name, photo URL array, and status <code>available</code>.</p>
+            </div></div>
+            <div class="scenario"><div>
+              <h3>POST a pet and read it back by ID</h3><span class="tag">@api</span>
+              <ol><li>Generate a unique pet ID and build a typed pet payload using <code>test-data/petstore.ts</code>.</li><li>Send <code>POST pet</code> with <code>Content-Type: application/json</code> and <code>Accept: application/json</code>.</li><li>Parse the create response and compare its ID, name, and status with the submitted payload.</li><li>Send <code>GET pet/{id}</code> using the newly created ID and parse the response.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> both requests return HTTP 200; the create response and follow-up GET preserve the pet ID, name, and <code>available</code> status.</p>
+            </div></div>
+            <div class="scenario"><div>
+              <h3>POST a store order and read it back by ID</h3><span class="tag">@api</span>
+              <ol><li>Generate a pet ID and create a pet through <code>POST pet</code> so the order references an existing sandbox record.</li><li>Generate an order ID and build an order payload with that pet ID, quantity one, status <code>placed</code>, ship date, and <code>complete: false</code>.</li><li>Send <code>POST store/order</code> with JSON headers and parse the response.</li><li>Send <code>GET store/order/{id}</code> with the generated order ID and parse the response.</li></ol>
+              <p class="assertions"><strong>Expected:</strong> pet setup and order creation return HTTP 200; response pet ID and order status match the request; quantity is a positive integer; follow-up GET returns the same order ID, pet ID, quantity, and status.</p>
+            </div></div>
           </div>
           <p style="margin-top:16px">The order case creates its referenced pet as setup, so its order payload refers to a real sandbox record. The public Petstore is shared and may be reset or respond variably.</p>
         </section>
@@ -431,11 +469,15 @@ npm run report           # open latest HTML report</code></pre>
 
         <section id="results">
           <div class="section-heading"><span class="section-number">07</span><h2>Latest local validation</h2></div>
-          <p>Recorded from the latest complete local run available while preparing this briefing:</p>
+          <p>Latest headed UI run: 3 passed, 4 skipped, and 0 failed. API results below are from the most recent separate API run.</p>
           <div class="status-grid" aria-label="Latest test outcomes">
-            <div class="status pass"><strong>3 passed</strong><small>All three Petstore API test cases</small></div>
-            <div class="status skip"><strong>7 skipped</strong><small>Amazon UI tests; challenge detected before scenario steps</small></div>
+            <div class="status pass"><strong>3 passed</strong><small>Homepage, search relevance, and brand filter UI scenarios</small></div>
+            <div class="status skip"><strong>4 skipped</strong><small>Product detail, add to cart, cart contents, and checkout</small></div>
             <div class="status"><strong>TypeScript OK</strong><small><code>npm run typecheck</code> completed successfully</small></div>
+          </div>
+          <div class="callout warning">
+            <strong>Why four UI scenarios were skipped</strong>
+            Amazon displayed a message that the selected product could not be shipped to the active delivery location. Product details therefore had no available offer, and add-to-cart, cart, and checkout scenarios could not continue. This was a delivery-availability limitation, not a login requirement. The Petstore API suite passed all 3 tests in its latest separate run.
           </div>
           <p>This status describes the local environment, not a guarantee of future live-service results. The generated run report is under <code>playwright-report/index.html</code>. The source project and workflow are in the GitHub repository <a href="https://github.com/srinivas786108/hcl_Hackathon">srinivas786108/hcl_Hackathon</a>.</p>
         </section>
@@ -446,7 +488,7 @@ npm run report           # open latest HTML report</code></pre>
             <li><strong>Scope:</strong> “This suite tests seven guest shopping interactions on Amazon and three create/read API cases on Petstore. Checkout stops before sign-in or purchase.”</li>
             <li><strong>Design:</strong> “Amazon locators and actions live in Page Objects; tests stay focused on scenario intent. The API tests use typed data and verify both create and read behavior.”</li>
             <li><strong>Execution:</strong> “I can run UI and API suites independently or together. GitHub Actions installs the browser, typechecks the project, executes tests, and stores the report.”</li>
-            <li><strong>Evidence:</strong> “The API cases passed locally. The UI tests were skipped when Amazon served its challenge page, so I am reporting that as an environment restriction, not a test pass.”</li>
+            <li><strong>Evidence:</strong> “The latest headed UI run passed 3 scenarios and skipped 4 product-dependent scenarios because Amazon said the selected item could not ship to the current location. The separate API run passed all 3 tests; the skips are not counted as passes.”</li>
             <li><strong>Safety:</strong> “The automation does not use account credentials or submit an order. To validate the full live storefront flow, we need an approved test setup that permits automation.”</li>
           </ol>
           <blockquote class="quote">“The suite demonstrates the automation architecture and assertions; the report also makes the limits of a live third-party storefront visible and auditable.”</blockquote>
