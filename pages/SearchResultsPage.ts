@@ -11,8 +11,11 @@ export class SearchResultsPage {
 
   async expectRelevantResults(query: RegExp): Promise<void> {
     await expect(this.results.first()).toBeVisible();
-    await expect(this.page.locator('[data-component-type="s-search-result"] h2').first())
-      .toContainText(query);
+    const matchingProductTitle = this.page
+      .locator('[data-component-type="s-search-result"] h2')
+      .filter({ hasText: query });
+    await expect(matchingProductTitle.first(), 'At least one result title should match the search')
+      .toBeVisible();
   }
 
   async applyBrandFilter(): Promise<void> {

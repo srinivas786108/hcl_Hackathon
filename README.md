@@ -40,6 +40,12 @@ npm run report
 
 Playwright creates `playwright-report/` after a test run. Screenshots, traces, and video are retained for failures in `test-results/`; both directories are excluded from Git.
 
+## GitHub Actions
+
+The workflow in `.github/workflows/playwright.yml` runs on pushes and pull requests targeting `main`, and can also be started manually from the repository's Actions tab. It installs dependencies and Chromium, runs the TypeScript check and all UI/API tests, then uploads the HTML report and test artifacts for 14 days. Open the workflow run in GitHub and download the `playwright-report` artifact to inspect results.
+
+Amazon can return an anti-automation challenge to hosted CI runners. In that case the UI tests are marked skipped by the suite's challenge guard; review the run summary and report rather than treating skipped scenarios as passed. The Petstore API tests run independently.
+
 ## Structure
 
 - `pages/`: Amazon Page Object Model classes and locators
