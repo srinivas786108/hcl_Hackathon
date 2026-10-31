@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Hackathon committee briefing for the Amazon Playwright UI and Swagger Petstore API automation project.">
+  <title>Amazon Playwright Automation | Hackathon Briefing</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172321;
+      --muted: #52615d;
+      --paper: #f6f7f2;
+      --surface: #ffffff;
+      --line: #d7ded9;
+      --forest: #164c3b;
+      --forest-dark: #10382d;
+      --lime: #d7ef8b;
+      --coral: #e5674e;
+      --gold: #f0c767;
+      --pale-green: #e8f1e9;
+      --pale-coral: #fae9e3;
+      --shadow: 0 16px 42px rgba(19, 45, 37, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      line-height: 1.65;
+    }
+    a { color: var(--forest); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    a:hover { color: var(--coral); }
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: 8px;
+      z-index: 20;
+      padding: 10px 14px;
+      background: var(--surface);
+    }
+    .skip-link:focus { left: 8px; }
+    .masthead {
+      position: relative;
+      overflow: hidden;
+      padding: 22px max(24px, calc((100% - 1160px) / 2));
+      background: var(--forest-dark);
+      color: #fff;
+    }
+    .masthead::after {
+      position: absolute;
+      right: -70px;
+      top: -150px;
+      width: 420px;
+      height: 420px;
+      border: 1px solid rgba(215, 239, 139, .25);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 42px rgba(215, 239, 139, .035), 0 0 0 92px rgba(215, 239, 139, .025);
+      pointer-events: none;
+    }
+    .masthead-inner, main, footer { width: min(1160px, calc(100% - 48px)); margin-inline: auto; }
+    .masthead-inner { position: relative; z-index: 1; }
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 48px;
+      color: #dce8df;
+      font-size: 13px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .class-label { display: inline-flex; align-items: center; gap: 9px; }
+    .class-label::before { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); content: ""; }
+    .print-button {
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 3px;
+      padding: 9px 13px;
+      color: #fff;
+      background: transparent;
+      font: inherit;
+      cursor: pointer;
+    }
+    .print-button:hover { background: rgba(255,255,255,.1); }
+    .eyebrow { margin: 0 0 12px; color: var(--lime); font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 820px;
+      margin-bottom: 18px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(42px, 6vw, 72px);
+      font-weight: 400;
+      line-height: 1.03;
+      letter-spacing: 0;
+    }
+    .dek { max-width: 710px; margin-bottom: 34px; color: #dce8df; font-size: 18px; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 10px 28px; color: #dce8df; font-size: 14px; }
+    .meta-row strong { color: #fff; }
+    .hero-bottom {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 46px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.18);
+    }
+    .metric { min-height: 98px; padding: 16px 18px; background: rgba(16,56,45,.84); }
+    .metric strong { display: block; color: var(--lime); font-family: Georgia, serif; font-size: 30px; font-weight: 400; line-height: 1.1; }
+    .metric span { display: block; margin-top: 7px; color: #dce8df; font-size: 13px; }
+    main { padding-block: 34px 70px; }
+    .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); align-items: start; gap: 42px; }
+    .toc {
+      position: sticky;
+      top: 18px;
+      padding: 18px 0;
+      border-top: 3px solid var(--coral);
+    }
+    .toc h2 { margin-bottom: 12px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+    .toc ol { margin: 0; padding-left: 20px; color: var(--muted); font-size: 13px; }
+    .toc li { padding: 4px 0; }
+    article { min-width: 0; }
+    section { scroll-margin-top: 20px; padding: 30px 0; border-top: 1px solid var(--line); }
+    section:first-child { border-top: 0; padding-top: 5px; }
+    .section-heading { display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px; }
+    .section-number { color: var(--coral); font-family: Georgia, serif; font-size: 18px; }
+    h2 { margin-bottom: 0; font-family: Georgia, "Times New Roman", serif; font-size: 31px; font-weight: 400; line-height: 1.2; }
+    h3 { margin-bottom: 8px; font-size: 16px; line-height: 1.35; }
+    p { margin-bottom: 14px; }
+    .lead { max-width: 760px; color: var(--muted); font-size: 17px; }
+    .callout {
+      margin: 20px 0;
+      padding: 17px 19px;
+      border-left: 4px solid var(--forest);
+      background: var(--pale-green);
+    }
+    .callout.warning { border-color: var(--coral); background: var(--pale-coral); }
+    .callout strong { display: block; margin-bottom: 4px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .panel { padding: 18px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+    .panel p:last-child { margin-bottom: 0; }
+    .tag {
+      display: inline-block;
+      margin: 2px 5px 2px 0;
+      padding: 2px 8px;
+      border: 1px solid #c5d6ca;
+      border-radius: 2px;
+      color: var(--forest-dark);
+      background: var(--pale-green);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .flow-step { position: relative; min-height: 100px; padding: 14px; border-top: 3px solid var(--coral); background: var(--surface); }
+    .flow-step b { display: block; margin-bottom: 5px; color: var(--forest); font-size: 13px; text-transform: uppercase; }
+    .flow-step span { color: var(--muted); font-size: 13px; }
+    .scenario-list { display: grid; gap: 10px; counter-reset: scenario; }
+    .scenario {
+      display: grid;
+      grid-template-columns: 42px minmax(0,1fr);
+      gap: 13px;
+      padding: 15px 16px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      counter-increment: scenario;
+    }
+    .scenario::before {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--forest);
+      content: counter(scenario, decimal-leading-zero);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .scenario h3 { margin: 1px 0 4px; }
+    .scenario p { margin: 0; color: var(--muted); font-size: 14px; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: #fff; background: var(--forest); font-size: 13px; }
+    td { font-size: 14px; }
+    tr:last-child td { border-bottom: 0; }
+    code, pre { font-family: Consolas, "Courier New", monospace; }
+    code { padding: 1px 4px; color: #773c2b; background: #f6ede6; font-size: .92em; }
+    pre {
+      overflow-x: auto;
+      margin: 12px 0 0;
+      padding: 17px;
+      color: #e9f2ec;
+      background: #172923;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .status-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin: 18px 0; }
+    .status { padding: 16px; background: var(--surface); border: 1px solid var(--line); }
+    .status strong { display: block; font-family: Georgia, serif; font-size: 28px; font-weight: 400; }
+    .status.pass strong { color: var(--forest); }
+    .status.skip strong { color: #a64c38; }
+    .status small { color: var(--muted); }
+    .check-list { padding-left: 20px; }
+    .check-list li { padding: 4px 0; }
+    .quote {
+      margin: 20px 0 0;
+      padding: 20px 22px;
+      border-left: 4px solid var(--gold);
+      color: var(--forest-dark);
+      background: #fff8df;
+      font-family: Georgia, serif;
+      font-size: 19px;
+    }
+    footer { padding: 20px 0 34px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; gap: 14px; }
+      .toc { position: static; padding: 12px 0; }
+      .toc ol { columns: 2; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-bottom { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .masthead-inner, main, footer { width: min(100% - 32px, 1160px); }
+      .masthead { padding: 18px 16px 24px; }
+      .topline { padding-bottom: 35px; }
+      .dek { font-size: 16px; }
+      .hero-bottom { margin-top: 30px; }
+      .metric { min-height: 86px; }
+      .grid-2, .status-grid { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr; }
+      .toc ol { columns: 1; }
+      h2 { font-size: 27px; }
+    }
+    @media print {
+      :root { --paper: #fff; --shadow: none; }
+      body { background: #fff; font-size: 10pt; }
+      .masthead { padding: 18px 24px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .masthead::after, .print-button, .toc { display: none; }
+      .masthead-inner, main, footer { width: 100%; }
+      .topline { padding-bottom: 18px; }
+      h1 { font-size: 36pt; }
+      .layout { display: block; }
+      section { break-inside: avoid; padding: 16px 0; }
+      .panel, .scenario, .flow-step, th, .metric, .callout { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      a { color: inherit; text-decoration: none; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to project briefing</a>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="topline">
+        <span class="class-label">Hackathon project briefing</span>
+        <button class="print-button" type="button" onclick="window.print()">Print / Save PDF</button>
+      </div>
+      <p class="eyebrow">Test Automation | UI + API</p>
+      <h1>Amazon Shopping Flows, Tested End to End</h1>
+      <p class="dek">A Playwright and TypeScript automation suite demonstrating Page Object Model design, browser assertions, REST API validation, and CI reporting.</p>
+      <div class="meta-row">
+        <span><strong>Audience</strong> Hackathon evaluation committee</span>
+        <span><strong>Stack</strong> Playwright | TypeScript | Node.js</span>
+        <span><strong>Track</strong> Test Automation</span>
+        <span><strong>Scope</strong> No real purchase</span>
+      </div>
+      <div class="hero-bottom" aria-label="Project at a glance">
+        <div class="metric"><strong>7</strong><span>Amazon UI scenarios</span></div>
+        <div class="metric"><strong>3</strong><span>Petstore API test cases</span></div>
+        <div class="metric"><strong>1</strong><span>Chromium test project</span></div>
+        <div class="metric"><strong>HTML</strong><span>Playwright report + CI artifact</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="layout">
+      <nav class="toc" aria-label="Contents">
+        <h2>Briefing contents</h2>
+        <ol>
+          <li><a href="#summary">Executive summary</a></li>
+          <li><a href="#design">Test design</a></li>
+          <li><a href="#ui">UI scenarios</a></li>
+          <li><a href="#api">API coverage</a></li>
+          <li><a href="#quality">Quality choices</a></li>
+          <li><a href="#execution">Run and reporting</a></li>
+          <li><a href="#results">Validation status</a></li>
+          <li><a href="#demo">Demo talk track</a></li>
+        </ol>
+      </nav>
+
+      <article>
+        <section id="summary">
+          <div class="section-heading"><span class="section-number">01</span><h2>Executive summary</h2></div>
+          <p class="lead">This project automates representative storefront tasks on Amazon.com and create/read operations against the public Swagger Petstore sandbox. It keeps UI and API tests independently runnable and organizes browser behavior behind Page Objects.</p>
+          <div class="grid-2">
+            <div class="panel">
+              <h3>What is demonstrated</h3>
+              <p>Reliable locator strategy, web-first assertions, reusable page actions, typed API payloads, response and follow-up checks, test tagging, failure diagnostics, and a repeatable GitHub Actions workflow.</p>
+            </div>
+            <div class="panel">
+              <h3>Safety boundary</h3>
+              <p>The Amazon flow stops at the sign-in checkpoint. It does not submit credentials, payment information, or a real order. Petstore is used for API practice because Amazon does not provide a public sandbox API for this exercise.</p>
+            </div>
+          </div>
+          <div class="callout warning">
+            <strong>Live-site limitation - transparent result reporting</strong>
+            Amazon is a third-party storefront that may vary by inventory, delivery region, consent, or anti-automation response. A skipped UI test is not a pass. The latest local full-suite run recorded below had 3 API passes and 7 UI skips after Amazon returned its automated-session challenge.
+          </div>
+        </section>
+
+        <section id="design">
+          <div class="section-heading"><span class="section-number">02</span><h2>Test design and project layout</h2></div>
+          <p>The test suite is split by responsibility. UI tests use the Playwright browser fixture and Amazon Page Objects. API tests create an independent Playwright request context with JSON headers. Each test can be selected and run without relying on another test's state.</p>
+          <div class="flow" aria-label="Automation architecture flow">
+            <div class="flow-step"><b>Test cases</b><span>Scenario and contract assertions</span></div>
+            <div class="flow-step"><b>Page objects</b><span>Amazon locators and user actions</span></div>
+            <div class="flow-step"><b>Playwright</b><span>Chromium + API request fixture</span></div>
+            <div class="flow-step"><b>Targets</b><span>Amazon.com and Petstore v2</span></div>
+            <div class="flow-step"><b>Evidence</b><span>HTML, trace, screenshot, video</span></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Path</th><th>Responsibility</th></tr></thead>
+              <tbody>
+                <tr><td><code>tests/ui/shopping.spec.ts</code></td><td>Seven independent shopping and checkout-checkpoint scenarios.</td></tr>
+                <tr><td><code>tests/api/petstore.spec.ts</code></td><td>GET pet search, create/read pet, and create/read order tests.</td></tr>
+                <tr><td><code>pages/</code></td><td><code>HomePage</code>, <code>SearchResultsPage</code>, <code>ProductPage</code>, and <code>CartPage</code>.</td></tr>
+                <tr><td><code>config/</code></td><td>Public target URL defaults and a safe <code>.env.example</code>; local <code>.env</code> is gitignored.</td></tr>
+                <tr><td><code>playwright.config.ts</code></td><td>Chromium project, India English locale, Kolkata timezone, timeouts, retry, and artifact policies.</td></tr>
+                <tr><td><code>.github/workflows/playwright.yml</code></td><td>CI typecheck, browser install, complete test run, and report artifact upload.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:16px"><span class="tag">@ui</span><span class="tag">@api</span><span class="tag">@smoke</span> Tags organize scenarios and allow filtered runs.</p>
+        </section>
+
+        <section id="ui">
+          <div class="section-heading"><span class="section-number">03</span><h2>Amazon UI scenarios</h2></div>
+          <p>All seven scenarios use a fresh Playwright browser context. Shared cart state is not assumed, and the checkout case ends at the expected sign-in prompt.</p>
+          <div class="scenario-list">
+            <div class="scenario"><div><h3>Homepage availability</h3><p>Open the configured storefront. Verify the Amazon page title, logo, and search input are visible.</p></div></div>
+            <div class="scenario"><div><h3>Search relevance</h3><p>Search for <code>wireless mouse</code>, wait for result listings, and require at least one result title matching the search phrase.</p></div></div>
+            <div class="scenario"><div><h3>Brand filter</h3><p>Search for the product and select the Logitech brand filter. Verify navigation reflects the filter action and results remain visible.</p></div></div>
+            <div class="scenario"><div><h3>Product details</h3><p>Open a listing and verify product title, price, customer rating, and primary image.</p></div></div>
+            <div class="scenario"><div><h3>Add to cart</h3><p>Record the initial cart count, add the product, and assert the displayed count increases by one.</p></div></div>
+            <div class="scenario"><div><h3>Cart contents</h3><p>Open the cart and check the selected product title, quantity of one, and a visible non-zero subtotal.</p></div></div>
+            <div class="scenario"><div><h3>Checkout sign-in checkpoint</h3><p>Proceed from the cart only until Amazon displays its sign-in prompt. No login or purchase is attempted.</p></div></div>
+          </div>
+          <div class="callout">
+            <strong>UI skip conditions</strong>
+            The homepage helper detects Amazon's "Click the button below to continue shopping" challenge and skips the UI case before scenario assertions run. This is unrelated to login. A product scenario can also skip when Amazon explicitly reports that the listing cannot ship to the active delivery location. Review skipped results as unexecuted tests, not successful validations.
+          </div>
+        </section>
+
+        <section id="api">
+          <div class="section-heading"><span class="section-number">04</span><h2>Swagger Petstore API coverage</h2></div>
+          <p>Base URL: <code>https://petstore.swagger.io/v2</code>. Requests accept JSON; POST requests send JSON payloads. Created records use generated identifiers to reduce collisions in the shared sandbox.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Case</th><th>Request sequence</th><th>Key validations</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Available pets</strong></td><td><code>GET /pet/findByStatus?status=available</code></td><td>HTTP 200; response is a non-empty array; each pet has available status, ID, name, and photo URL list; elapsed time under 2,000 ms.</td></tr>
+                <tr><td><strong>Create and read pet</strong></td><td><code>POST /pet</code>, then <code>GET /pet/{id}</code></td><td>HTTP 200; response preserves submitted ID, name, and status; follow-up GET returns the created pet details.</td></tr>
+                <tr><td><strong>Create and read order</strong></td><td>Create a test pet, <code>POST /store/order</code>, then <code>GET /store/order/{id}</code></td><td>HTTP 200; returned pet ID and placed status match; quantity is a positive integer; follow-up GET returns the order fields.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:16px">The order case creates its referenced pet as setup, so its order payload refers to a real sandbox record. The public Petstore is shared and may be reset or respond variably.</p>
+        </section>
+
+        <section id="quality">
+          <div class="section-heading"><span class="section-number">05</span><h2>Reliability and maintainability choices</h2></div>
+          <div class="grid-2">
+            <div class="panel">
+              <h3>Browser behavior</h3>
+              <ul class="check-list">
+                <li>Uses Playwright web-first expectations rather than fixed sleeps.</li>
+                <li>Centralizes Amazon selectors and actions in Page Objects.</li>
+                <li>Uses stable IDs and semantic role/text locators where available.</li>
+                <li>Uses a bounded homepage check to distinguish storefront from a known challenge.</li>
+                <li>Does not bypass bot protection or automate purchase completion.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>API behavior</h3>
+              <ul class="check-list">
+                <li>Uses Playwright APIRequestContext, JSON headers, and typed payload interfaces.</li>
+                <li>Asserts status and response data, then verifies persisted create/read flows.</li>
+                <li>Disposes each request context after each test.</li>
+                <li>Uses unique runtime IDs to avoid fixed-ID conflicts in the shared service.</li>
+                <li>Keeps API tests independent of browser behavior.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout">
+            <strong>Diagnostics on failure</strong>
+            Playwright is configured for an HTML report, screenshots on failure, traces retained on failure, and failure video. CI uploads <code>playwright-report/</code> and <code>test-results/</code> even when a test step fails.
+          </div>
+        </section>
+
+        <section id="execution">
+          <div class="section-heading"><span class="section-number">06</span><h2>Run and reporting guide</h2></div>
+          <p>Prerequisites: Node.js 20 or newer, npm, and network access to the public targets. From the project root:</p>
+          <pre><code>npm install
+Copy-Item config/.env.example config/.env
+npm run install:browsers
+
+npm run typecheck
+npm test                 # complete UI and API suite
+npm run test:ui          # Amazon UI only
+npm run test:api         # Petstore API only
+npm run test:smoke       # @smoke scenarios
+npm run report           # open latest HTML report</code></pre>
+          <p>GitHub Actions runs on pushes and pull requests targeting <code>main</code>, with a manual <code>workflow_dispatch</code> option. The workflow installs Chromium, typechecks, runs the full suite, and retains the report and test artifacts for 14 days.</p>
+          <div class="callout warning">
+            <strong>Important about test status</strong>
+            Playwright's skipped count means the test did not run its assertions. Amazon can challenge hosted CI traffic. For evaluation, use an approved test environment or an authorized run where Amazon serves the storefront; do not describe skipped UI tests as passes.
+          </div>
+        </section>
+
+        <section id="results">
+          <div class="section-heading"><span class="section-number">07</span><h2>Latest local validation</h2></div>
+          <p>Recorded from the latest complete local run available while preparing this briefing:</p>
+          <div class="status-grid" aria-label="Latest test outcomes">
+            <div class="status pass"><strong>3 passed</strong><small>All three Petstore API test cases</small></div>
+            <div class="status skip"><strong>7 skipped</strong><small>Amazon UI tests; challenge detected before scenario steps</small></div>
+            <div class="status"><strong>TypeScript OK</strong><small><code>npm run typecheck</code> completed successfully</small></div>
+          </div>
+          <p>This status describes the local environment, not a guarantee of future live-service results. The generated run report is under <code>playwright-report/index.html</code>. The source project and workflow are in the GitHub repository <a href="https://github.com/srinivas786108/hcl_Hackathon">srinivas786108/hcl_Hackathon</a>.</p>
+        </section>
+
+        <section id="demo">
+          <div class="section-heading"><span class="section-number">08</span><h2>Suggested committee talk track</h2></div>
+          <ol class="check-list">
+            <li><strong>Scope:</strong> “This suite tests seven guest shopping interactions on Amazon and three create/read API cases on Petstore. Checkout stops before sign-in or purchase.”</li>
+            <li><strong>Design:</strong> “Amazon locators and actions live in Page Objects; tests stay focused on scenario intent. The API tests use typed data and verify both create and read behavior.”</li>
+            <li><strong>Execution:</strong> “I can run UI and API suites independently or together. GitHub Actions installs the browser, typechecks the project, executes tests, and stores the report.”</li>
+            <li><strong>Evidence:</strong> “The API cases passed locally. The UI tests were skipped when Amazon served its challenge page, so I am reporting that as an environment restriction, not a test pass.”</li>
+            <li><strong>Safety:</strong> “The automation does not use account credentials or submit an order. To validate the full live storefront flow, we need an approved test setup that permits automation.”</li>
+          </ol>
+          <blockquote class="quote">“The suite demonstrates the automation architecture and assertions; the report also makes the limits of a live third-party storefront visible and auditable.”</blockquote>
+        </section>
+      </article>
+    </div>
+  </main>
+  <footer>
+    <p>Hackathon project briefing | Playwright + TypeScript | October 2026</p>
+  </footer>
+</body>
+</html>
