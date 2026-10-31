@@ -1,23 +1,12 @@
 import { expect, request as apiRequest, test, type APIRequestContext } from '@playwright/test';
 import { petstoreBaseUrl } from '../../config/urls';
-
-interface Pet {
-  id: number;
-  category: { id: number; name: string };
-  name: string;
-  photoUrls: string[];
-  tags: { id: number; name: string }[];
-  status: string;
-}
-
-interface StoreOrder {
-  id: number;
-  petId: number;
-  quantity: number;
-  shipDate: string;
-  status: string;
-  complete: boolean;
-}
+import {
+  availablePetStatus,
+  createPetPayload,
+  createStoreOrderPayload,
+  type Pet,
+  type StoreOrder
+} from '../../test-data/petstore';
 
 let api: APIRequestContext;
 
@@ -36,7 +25,7 @@ test.describe('Swagger Petstore API @api', () => {
   test('GET available pets returns a valid non-empty list under two seconds @smoke', async () => {
     const startedAt = Date.now();
     const response = await api.get('pet/findByStatus', {
-      params: { status: 'available' }
+      params: { status: availablePetStatus }
     });
     const elapsedMs = Date.now() - startedAt;
     expect(response.status(), 'Available-pets lookup should return HTTP 200').toBe(200);
@@ -46,7 +35,7 @@ test.describe('Swagger Petstore API @api', () => {
     expect(Array.isArray(pets), 'The response body should be an array').toBe(true);
     expect(pets.length, 'At least one available pet should be returned').toBeGreaterThan(0);
     for (const pet of pets) {
-      expect(pet.status, `Pet ${pet.id} should have available status`).toBe('available');
+      expect(pet.status, `Pet ${pet.id} should have available status`).toBe(availablePetStatus);
       expect(pet.id, 'Each pet should include an id').toBeDefined();
       expect(pet.name, `Pet ${pet.id} should include a name`).toBeTruthy();
       expect(Array.isArray(pet.photoUrls), `Pet ${pet.id} should include photoUrls`).toBe(true);
@@ -55,14 +44,7 @@ test.describe('Swagger Petstore API @api', () => {
 
   test('POST a pet and read it back by id', async () => {
     const petId = Date.now();
-    const pet: Pet = {
-      id: petId,
-      category: { id: 1, name: 'dogs' },
-      name: 'Buddy',
-      photoUrls: ['https://example.com/buddy.jpg'],
-      tags: [{ id: 1, name: 'cute' }],
-      status: 'available'
-    };
+    const pet = createPetPayload(petId, 'Buddy');
 
     const createResponse = await api.post('pet', {
       data: pet,
@@ -72,7 +54,7 @@ test.describe('Swagger Petstore API @api', () => {
     const createdPet = await createResponse.json() as Pet;
     expect(createdPet.id, 'The created pet should retain the submitted id').toBe(pet.id);
     expect(createdPet.name, 'The created pet should retain the submitted name').toBe(pet.name);
-    expect(createdPet.status, 'The created pet should retain available status').toBe('available');
+    expect(createdPet.status, 'The created pet should retain available status').toBe(availablePetStatus);
 
     const readResponse = await api.get(`pet/${pet.id}`);
     expect(readResponse.status(), 'The newly created pet should be readable').toBe(200);
@@ -84,25 +66,11 @@ test.describe('Swagger Petstore API @api', () => {
 
   test('POST a store order and read it back by id', async () => {
     const petId = Date.now();
-    const pet: Pet = {
-      id: petId,
-      category: { id: 1, name: 'dogs' },
-      name: 'Order test pet',
-      photoUrls: ['https://example.com/order-pet.jpg'],
-      tags: [{ id: 1, name: 'test' }],
-      status: 'available'
-    };
+    const pet: Pet = createPetPayload(petId, 'Order test pet');
     const petResponse = await api.post('pet', { data: pet });
     expect(petResponse.status(), 'Order setup should create the referenced pet').toBe(200);
 
-    const order: StoreOrder = {
-      id: Date.now() + 1,
-      petId,
-      quantity: 1,
-      shipDate: '2026-10-28T10:00:00.000Z',
-      status: 'placed',
-      complete: false
-    };
+    const order: StoreOrder = createStoreOrderPayload(Date.now() + 1, petId);
     const createResponse = await api.post('store/order', {
       data: order,
       headers: { 'Content-Type': 'application/json' }
