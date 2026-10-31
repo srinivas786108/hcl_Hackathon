@@ -48,6 +48,16 @@ Playwright creates `playwright-report/` after a test run. Screenshots, traces, a
 - `config/`: target URL defaults and `.env.example`
 - `playwright.config.ts`: Chromium project, timeouts, retries, and reporting
 
+## UI skips and diagnostics
+
+Each UI test gets a fresh Playwright browser context. The tests do not reuse the open browser tab, its cookies, delivery address, or cart contents.
+
+The shared homepage helper looks for Amazon's normal storefront logo or the heading "Click the button below to continue shopping." If Amazon returns that challenge page, the test is marked **skipped** before its scenario runs. This is not a login failure. If all seven UI tests are skipped, none of the Amazon UI assertions ran; the API tests are independent and can still pass.
+
+The product-detail scenario also skips when Amazon explicitly says the selected item cannot ship to the current delivery location. Other product and cart scenarios require a product with an available offer, so results can vary with Amazon's inventory and delivery region. The configured `en-IN` locale and `Asia/Kolkata` timezone do not set the Amazon delivery PIN.
+
+Check the terminal summary and HTML report for skipped tests and their reasons. A skipped test is not a passing test. To run the UI assertions, use an Amazon or organizer-approved test setup that serves the storefront and has an available product; do not attempt to bypass Amazon's challenge.
+
 ## Notes
 
 Amazon is a live storefront and can vary by region, inventory, consent state, or bot-protection response. The UI suite does not use a saved account or place an order. The Petstore service is a shared public sandbox; its data can be reset and response latency depends on the network. The available-pets check intentionally enforces the brief's non-empty response and sub-2000 ms response-time requirements.
