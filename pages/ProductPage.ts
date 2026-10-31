@@ -10,8 +10,8 @@ export class ProductPage {
   constructor(private readonly page: Page) {
     this.title = page.locator('#productTitle');
     this.price = page.locator(
-      '#corePriceDisplay_desktop_feature_div .a-offscreen, #priceblock_ourprice, #priceblock_dealprice, #apex_desktop .a-price .a-offscreen'
-    ).first();
+      '#corePriceDisplay_desktop_feature_div .a-price:visible, #priceblock_ourprice:visible, #priceblock_dealprice:visible, #apex_desktop .a-price:visible'
+    ).filter({ hasText: /\d/ }).first();
     this.rating = page.locator('#acrPopover, #averageCustomerReviews');
     this.image = page.locator('#landingImage');
     this.addToCartButton = page.locator('#add-to-cart-button');

@@ -21,8 +21,18 @@ export class CartPage {
   }
 
   async expectQuantityOne(): Promise<void> {
-    const quantity = this.page.locator('select[name="quantity"]').first();
-    await expect(quantity, 'The cart quantity selector should be available').toHaveValue('1');
+    const item = this.items.first();
+    const quantityField = item.locator('select[name="quantity"], input[name="quantity"]').first();
+    if (await quantityField.count()) {
+      await expect(quantityField, 'The cart item quantity should be one').toHaveValue('1');
+      return;
+    }
+
+    const quantityControl = item.locator(
+      '.sc-action-quantity, [data-a-selector="quantity"], [aria-label*="quantity" i]'
+    ).first();
+    await expect(quantityControl, 'The cart item should display its quantity').toBeVisible();
+    await expect(quantityControl).toContainText(/\b1\b/);
   }
 
   async expectSubtotalVisible(): Promise<void> {
