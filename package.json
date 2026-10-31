@@ -1,0 +1,23 @@
+{
+  "name": "amazon-playwright-hackathon",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright UI and API automation for the Amazon shopping and Swagger Petstore hackathon",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test tests/ui",
+    "test:api": "playwright test tests/api",
+    "test:smoke": "playwright test --grep @smoke",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "install:browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.8.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
