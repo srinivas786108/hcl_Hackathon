@@ -484,6 +484,21 @@ npm run report           # open latest HTML report</code></pre>
               <li><strong>Cart contents:</strong> uses the same add-to-cart setup. Since no item can be added, product, quantity, and subtotal assertions cannot run.</li>
               <li><strong>Checkout scenario:</strong> also depends on adding the item first. The shared setup skips before the cart/checkout steps because the test cart has no available product.</li>
             </ol>
+            <div class="panel" style="margin-top:16px">
+              <h3>Illustrative demo fixture for the four skipped flows</h3>
+              <p>This sample shows the kind of values those assertions would check in a permitted mock/demo environment. It is invented fixture data only; it is not Amazon data, execution evidence, or a passing test result.</p>
+              <pre><code>{
+  "productTitle": "Demo Wireless Mouse",
+  "price": "$19.99",
+  "rating": "4.4 out of 5",
+  "imagePlaceholder": "demo-wireless-mouse.png",
+  "cartCountBefore": 0,
+  "cartCountAfter": 1,
+  "cartQuantity": 1,
+  "cartSubtotal": "$19.99",
+  "checkoutCheckpoint": "Sign-in prompt visible; no order submitted"
+}</code></pre>
+            </div>
             <p style="margin-top:12px"><strong>Why the manual browser can differ:</strong> each Playwright test creates a fresh browser context. It does not inherit the open manual browser tab, its cookies, delivery PIN, or cart. The configured <code>en-IN</code> locale and <code>Asia/Kolkata</code> timezone do not set a delivery address.</p>
             <p><strong>Why these flows cannot continue:</strong> price, add-to-cart, cart totals, and checkout depend on a deliverable offer. When Amazon provides none for the active location, those product-dependent assertions cannot be exercised. Run them with an approved test location and a listing available there. A bot-protection challenge is a separate possible skip condition.</p>
             <p>The Petstore API suite is independent of Amazon and passed all 3 tests in its latest separate run.</p>
