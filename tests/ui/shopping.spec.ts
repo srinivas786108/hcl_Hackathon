@@ -9,11 +9,12 @@ const searchTerm = 'wireless mouse';
 async function openHome(page: Page): Promise<HomePage> {
   const home = new HomePage(page);
   await home.goto();
-  const challengeHeading = page.getByRole('heading', {
-    name: /click the button below to continue shopping/i
-  });
+  const challengePage = page.getByRole('heading', {
+    name: /click the button below to continue shopping|robot check/i
+  }).or(page.getByRole('button', { name: /continue shopping/i }))
+    .or(page.locator('#captchacharacters, form[action*="validateCaptcha"]'));
   const pageState = await Promise.race([
-    challengeHeading.waitFor({ state: 'visible', timeout: 10_000 })
+    challengePage.first().waitFor({ state: 'visible', timeout: 10_000 })
       .then(() => 'challenge' as const).catch(() => undefined),
     home.logo.waitFor({ state: 'visible', timeout: 10_000 })
       .then(() => 'storefront' as const).catch(() => undefined)
@@ -27,17 +28,21 @@ async function openHome(page: Page): Promise<HomePage> {
   return home;
 }
 
-async function openProduct(page: Page): Promise<ProductPage> {
-  const home = await openHome(page);
-  await home.searchFor(searchTerm);
-  const results = new SearchResultsPage(page);
-  await results.openFirstProduct();
+async function skipIfUnavailableForDelivery(page: Page): Promise<void> {
   const unavailableNotice = page.getByText(
     /cannot be shipped to your selected delivery location/i
   ).first();
   if (await unavailableNotice.isVisible().catch(() => false)) {
     test.skip(true, 'The selected listing is unavailable for the current Amazon delivery location.');
   }
+}
+
+async function openProduct(page: Page): Promise<ProductPage> {
+  const home = await openHome(page);
+  await home.searchFor(searchTerm);
+  const results = new SearchResultsPage(page);
+  await results.openFirstProduct();
+  await skipIfUnavailableForDelivery(page);
   return new ProductPage(page);
 }
 
@@ -47,6 +52,7 @@ async function addOneItemToCart(page: Page): Promise<string> {
   await home.searchFor(searchTerm);
   const results = new SearchResultsPage(page);
   await results.openFirstProduct();
+  await skipIfUnavailableForDelivery(page);
   const product = new ProductPage(page);
   const productTitle = (await product.title.innerText()).trim();
   await product.addToCart();
